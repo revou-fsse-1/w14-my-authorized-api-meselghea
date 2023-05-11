@@ -1,16 +1,35 @@
 import {
   Injectable,
   NotFoundException,
-  UnauthorizedException,
-} from '@nestjs/common';
+  UnauthorizedException, BadRequestException
+}
+from '@nestjs/common';
 import { PrismaService } from './../prisma/prisma.service';
+import { CreateUserDto } from 'src/users/dto/create-user.dto';
+import { UsersService } from 'src/users/users.service';
+import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
 import { AuthEntity } from './entity/auth.entity';
+
+export const roundsOfHashing = 10;
 
 @Injectable()
 export class AuthService {
-  constructor(private prisma: PrismaService, private jwtService: JwtService) {}
-
+  constructor(private prisma: PrismaService, private jwtService: JwtService, private user: UsersService, private configService: ConfigService) {}
+  
+  async signup(createUserDto: CreateUserDto ) {
+    // Check if user exists
+    const userExists = await this.user.findByUsername(createUserDto.username, createUserDto.email);
+    if (userExists) {
+      throw new BadRequestException('User already exists');
+    }
+    const hash = await bcrypt.hash(createUserDto.password,
+    roundsOfHashing,
+  );
+  createUserDto.password = hash;
+  return this.prisma.user.create({data: createUserDto });
+}
   async login(email: string, password: string): Promise<AuthEntity> {
     // Step 1: Fetch a user with the given email
     const user = await this.prisma.user.findUnique({ where: { email: email } });

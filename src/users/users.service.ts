@@ -13,12 +13,14 @@ export class UsersService {
     return this.prisma.user.create({ data: createUserDto });
   }
 
-
   update(id: number, updateUserDto: UpdateUserDto) {
     return this.prisma.user.update({ where: { id }, data: updateUserDto });
   }
   findOne(id: number) {
-    return this.prisma.seller.findUnique({ where: { id: id }});
+    return this.prisma.user.findUnique({ where: { id: id }});
+  }
+  findByUsername(username: string, email: string) {
+    return this.prisma.user.findUnique({ where: { username: username, email: email}});
   }
   remove(id: number) {
     return this.prisma.user.delete({ where: { id } });

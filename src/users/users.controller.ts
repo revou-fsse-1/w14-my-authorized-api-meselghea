@@ -9,18 +9,11 @@ import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 export class UsersController {
   constructor(private readonly usersService: UsersService ) {}
 
-  @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
-  }
-
   @Get(':id')
   @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
   async findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.usersService.findOne(id);
+    return await this.usersService.findOne(id);
   }
-  
   @Patch(':id')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
