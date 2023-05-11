@@ -3,9 +3,6 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 
-// This should be a real class/interface representing a user entity
-export type User = any;
-
 @Injectable()
 export class UsersService {
   constructor(private prisma: PrismaService) {}

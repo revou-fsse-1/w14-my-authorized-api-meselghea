@@ -8,14 +8,14 @@ import { ConfigModule } from '@nestjs/config';
 import { UsersModule } from 'src/users/users.module';
 import { JwtStrategy } from './jwt.strategy';
 
-export const jwtSecret = 'zjP9h6ZI5LoSKCRj';
+export const jwtSecret = process.env.SECRET_KEY;
 @Module({
   imports: [
     ConfigModule,
     PrismaModule,
     PassportModule,
     JwtModule.register({
-      secret: 'zjP9h6ZI5LoSKCRj',
+      secret: process.env.SECRET_KEY,
       signOptions: { expiresIn: '5m' }, 
     }),
     UsersModule,
