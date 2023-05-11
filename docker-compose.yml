@@ -1,0 +1,17 @@
+version: '3'
+services:
+  postgres:
+    image: postgres:14
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_DB=dbmesel
+      - POSTGRES_USER=dbmesel_user
+      - POSTGRES_PASSWORD=rU0BK1D0mUO59mrvvFArrmH4aMNOyzTo 
+  pgadmin:
+    image: dpage/pgadmin4
+    environment: 
+      - PGADMIN_DEFAULT_EMAIL=mesgel@gmail.com
+      - PGADMIN_DEFAULT_PASSWORD=SuperSecret
+    ports:
+      - 15432:80
