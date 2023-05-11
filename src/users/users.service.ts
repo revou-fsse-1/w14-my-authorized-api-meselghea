@@ -2,35 +2,24 @@ import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
-import * as bcrypt from 'bcrypt';
-export const roundsOfHashing = 10;
+
+// This should be a real class/interface representing a user entity
+export type User = any;
 
 @Injectable()
 export class UsersService {
   constructor(private prisma: PrismaService) {}
-  async create(createUserDto: CreateUserDto) {
-    const hashedPassword = await bcrypt.hash(
-      createUserDto.password,
-      roundsOfHashing,
-    );
-
-    createUserDto.password = hashedPassword;
-
+  create(createUserDto: CreateUserDto) {
     return this.prisma.user.create({ data: createUserDto });
   }
-  findOne(id: number) {
-    return this.prisma.user.findUnique({ where: { id } });
-  }
-  async update(id: number, updateUserDto: UpdateUserDto) {
-    if (updateUserDto.password) {
-      updateUserDto.password = await bcrypt.hash(
-        updateUserDto.password,
-        roundsOfHashing,
-      );
-    }
+
+
+  update(id: number, updateUserDto: UpdateUserDto) {
     return this.prisma.user.update({ where: { id }, data: updateUserDto });
   }
-
+  findOne(id: number) {
+    return this.prisma.seller.findUnique({ where: { id: id }});
+  }
   remove(id: number) {
     return this.prisma.user.delete({ where: { id } });
   }
