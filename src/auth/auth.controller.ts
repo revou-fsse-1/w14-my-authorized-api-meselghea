@@ -1,14 +1,14 @@
-import { Body, Post, Controller, Res, UseGuards } from '@nestjs/common';
+import { Body, Post, Controller, Res, Get, UseGuards, Req, Session } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiTags } from '@nestjs/swagger';
 import { AuthEntity } from './entity/auth.entity';
 import { LoginDto } from './dto/login.dto';
-import * as bcrypt from 'bcrypt';
-import {JwtService} from "@nestjs/jwt";
-import {Response, Request} from 'express';
+import { Response, Request } from 'express';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { JwtService } from '@nestjs/jwt';
+
 @Controller()
 @ApiTags('auth')
 export class AuthController {
@@ -20,18 +20,13 @@ export class AuthController {
   }
 
   @Post('login')
-  @ApiOkResponse({ type: AuthEntity })
-  login(@Body() { email, password }: LoginDto) {
-    return this.authService.login(email, password);
+  async login(@Req() req, @Res() res, @Body() dto: LoginDto) {
+    return this.authService.login(dto, req, res);
   }
 
-  @Post('logout')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
-  logout(@Res({passthrough: true}) response: Response) {
-  response.clearCookie('jwt');
-  return {
-    message: 'success'
-}
+  @Get('logout')
+  signout(@Req() req, @Res() res) {
+    return this.authService.signout(req, res);
   }
 }
+

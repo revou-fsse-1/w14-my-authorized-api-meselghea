@@ -1,55 +1,93 @@
 import {
-  Injectable,
-  NotFoundException,
-  UnauthorizedException, BadRequestException
+  Injectable, ForbiddenException, BadRequestException,
 }
 from '@nestjs/common';
 import { PrismaService } from './../prisma/prisma.service';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
-import { UsersService } from 'src/users/users.service';
-import * as bcrypt from 'bcrypt';
+import { LoginDto } from './dto/login.dto';
 import { JwtService } from '@nestjs/jwt';
-import { ConfigService } from '@nestjs/config';
+import { UsersService } from 'src/users/users.service';
+//import { ConfigService } from '@nestjs/config';
 import { AuthEntity } from './entity/auth.entity';
-
-export const roundsOfHashing = 10;
+import { jwtSecret } from './auth.module';
+import * as bcrypt from 'bcrypt';
+import { Request, Response } from 'express';
+const saltRounds = 10;
 
 @Injectable()
 export class AuthService {
-  constructor(private prisma: PrismaService, private jwtService: JwtService, private user: UsersService, private configService: ConfigService) {}
+  constructor(private prisma: PrismaService, private jwtService: JwtService, private user: UsersService,) {}
   
   async signup(createUserDto: CreateUserDto ) {
-    // Check if user exists
-    const userExists = await this.user.findByUsername(createUserDto.username, createUserDto.email);
-    if (userExists) {
-      throw new BadRequestException('User already exists');
-    }
-    const hash = await bcrypt.hash(createUserDto.password,
-    roundsOfHashing,
-  );
-  createUserDto.password = hash;
-  return this.prisma.user.create({data: createUserDto });
-}
-  async login(email: string, password: string): Promise<AuthEntity> {
-    // Step 1: Fetch a user with the given email
-    const user = await this.prisma.user.findUnique({ where: { email: email } });
+     const salt = await bcrypt.genSalt(saltRounds);
+     const hashedPassword = await bcrypt.hash( createUserDto.password, salt );
 
-    // If no user is found, throw an error
-    if (!user) {
-      throw new NotFoundException(`No user found for email: ${email}`);
-    }
+    createUserDto.password = hashedPassword;
 
-    // Step 2: Check if the password is correct
-    const isPasswordValid = user.password === password;
+    return this.prisma.user.create({
+      data: createUserDto,
+    });
+  }
 
-    // If password does not match, throw an error
-    if (!isPasswordValid) {
-      throw new UnauthorizedException('Invalid password');
+  async login(dto: LoginDto, req: Request, res: Response ) {
+    const { email, password } = dto;
+
+    const foundUser = await this.prisma.user.findUnique({
+      where: {
+        email,
+      },
+    });
+
+    if (!foundUser) {
+      throw new BadRequestException('Wrong credentials');
     }
 
-    // Step 3: Generate a JWT containing the user's ID and return it
-    return {
-      accessToken: this.jwtService.sign({ userId: user.id }),
+    const compareSuccess = await bcrypt.compare(
+      password, foundUser.password
+    );
+
+    if (!compareSuccess) {
+      throw new BadRequestException('Wrong credentials');
+    }
+
+    const token = await this.signToken({ userId: foundUser.id,
+      email: foundUser.email
+    });
+
+    if (!token) {
+      throw new ForbiddenException('Could not signin');
+    }
+
+    res.cookie('token', token, {});
+
+    return res.send({ message: 'Logged in succefully' });
+  }
+  async signout(req: Request, res: Response) {
+    res.clearCookie('token');
+
+    return res.send({ message: 'Logged out succefully' });
+  }
+
+  async hashPassword(password: string) {
+    const saltOrRounds = 10;
+
+    return await bcrypt.hash(password, saltOrRounds);
+  }
+
+  async comparePasswords(args: { hash: string; password: string }) {
+    return await bcrypt.compare(args.password, args.hash);
+  }
+
+  async signToken(args: { userId: number; email: string }) {
+    const payload = {
+      id: args.userId,
+      email: args.email,
     };
+
+    const token = await this.jwtService.signAsync(payload, {
+      secret: jwtSecret,
+    });
+
+    return token;
   }
 }
