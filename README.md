@@ -4,7 +4,7 @@
 
 [mesel14.onrender.com](https://mesel14.onrender.com/)
 
-### Enpoinds
+### Enpoints
 
 |                     |                                           |
 | :------------------ | :---------------------------------------- |

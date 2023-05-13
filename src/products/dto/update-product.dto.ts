@@ -20,6 +20,5 @@ export class UpdateProductDto {
     
     @IsNumber()
     @ApiProperty()
-    @MinLength(5)
     sellerId: number;
 }
