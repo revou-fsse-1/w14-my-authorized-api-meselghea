@@ -14,6 +14,6 @@
 | DELETE/products/:id | Delete product with authenticatied        |
 | GET/products/?q=cat | Get all products that contains cat        |
 | GET/products/:id    | Get product by id                         |
-| POST/register       | Create a new user, ( password hashing)    |
-| POST/login          | login DB                                  |
+| POST/register       | Create a new user( password hashing)    |
+| POST/login          | login user with create token                                 |
 | GET/logout          | logout (clear cookies )                   |
