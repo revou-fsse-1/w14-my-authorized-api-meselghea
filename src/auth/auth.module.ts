@@ -7,6 +7,7 @@ import { PrismaModule } from 'src/prisma/prisma.module';
 import { ConfigModule } from '@nestjs/config';
 import { UsersModule } from 'src/users/users.module';
 import { JwtStrategy } from './jwt.strategy';
+import { sessionSerializer } from './session.serializer';
 
 export const jwtSecret = process.env.SECRET_KEY;
 @Module({
@@ -21,7 +22,7 @@ export const jwtSecret = process.env.SECRET_KEY;
     UsersModule,
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy],
+  providers: [AuthService, JwtStrategy, sessionSerializer],
 })
 export class AuthModule {}
 

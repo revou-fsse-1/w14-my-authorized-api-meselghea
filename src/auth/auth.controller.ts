@@ -1,13 +1,12 @@
-import { Body, Post, Controller, Res, Get, UseGuards, Req, Session } from '@nestjs/common';
+import { Body, Post, Controller, UseGuards, Req, Res } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { ApiTags } from '@nestjs/swagger';
 import { AuthEntity } from './entity/auth.entity';
 import { LoginDto } from './dto/login.dto';
-import { Response, Request } from 'express';
-import { ApiBearerAuth } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOkResponse } from '@nestjs/swagger';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
-import { JwtService } from '@nestjs/jwt';
+import { Response, Request } from 'express';
 
 @Controller()
 @ApiTags('auth')
@@ -20,13 +19,16 @@ export class AuthController {
   }
 
   @Post('login')
-  async login(@Req() req, @Res() res, @Body() dto: LoginDto) {
-    return this.authService.login(dto, req, res);
+  @ApiOkResponse({ type: AuthEntity })
+  login(@Body() { email, password }: LoginDto) {
+    return this.authService.login(email, password);
   }
 
-  @Get('logout')
-  signout(@Req() req, @Res() res) {
-    return this.authService.signout(req, res);
-  }
+  @Post('logout')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  async logout(@Req() req: Request, @Res() res: Response) {
+      req.session.destroy(null);
+      res.clearCookie ('connect.sid');
+     }
 }
-
