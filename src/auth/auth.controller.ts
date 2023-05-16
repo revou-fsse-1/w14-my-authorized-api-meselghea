@@ -27,7 +27,7 @@ export class AuthController {
   @Post('logout')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  async logout(@Req() req: Request, @Res() res: Response) {
+  logout(@Req() req: Request, @Res() res: Response) {
       req.session.destroy(null);
       res.clearCookie ('connect.sid');
      }
