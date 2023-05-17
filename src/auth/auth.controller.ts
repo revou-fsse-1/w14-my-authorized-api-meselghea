@@ -9,7 +9,6 @@ import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { Response, Request } from 'express';
 import { JwtService } from '@nestjs/jwt';
 import { Session as SessionType } from 'express-session';
-import { send } from 'process';
 
 @Controller()
 @ApiTags('auth')
