@@ -29,6 +29,7 @@ export class AuthController {
   @Post('logout')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
+<<<<<<< HEAD
   logout(@Session() session: SessionType, @Res() res: Response): void {
     session.destroy((err: any) => {
       if (err) {
