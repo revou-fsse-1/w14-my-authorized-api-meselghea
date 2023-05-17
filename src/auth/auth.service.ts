@@ -45,5 +45,4 @@ export class AuthService {
       accessToken: this.jwtService.sign({ userId: user.id }),
     };
   }
-
 }

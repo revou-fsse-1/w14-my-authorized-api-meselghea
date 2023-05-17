@@ -1,4 +1,4 @@
-import { Body, Post, Controller, UseGuards, Req, Res } from '@nestjs/common';
+import { Body, Post, Controller, UseGuards, Session, Get, Res } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { ApiTags } from '@nestjs/swagger';
 import { AuthEntity } from './entity/auth.entity';
@@ -7,11 +7,14 @@ import { ApiBearerAuth, ApiOkResponse } from '@nestjs/swagger';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { Response, Request } from 'express';
+import { JwtService } from '@nestjs/jwt';
+import { Session as SessionType } from 'express-session';
+import { send } from 'process';
 
 @Controller()
 @ApiTags('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly authService: AuthService, private readonly jwtService: JwtService ) {}
   
   @Post('register')
   signup(@Body() createUserDto: CreateUserDto) {
@@ -27,8 +30,13 @@ export class AuthController {
   @Post('logout')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  logout(@Req() req: Request, @Res() res: Response) {
-      req.session.destroy(null);
-      res.clearCookie ('connect.sid');
-     }
+  logout(@Session() session: SessionType, @Res() res: Response): void {
+    session.destroy((err: any) => {
+      if (err) {
+        throw new Error(err);
+      }
+    });
+    res.clearCookie('connect.sid');
+    res.send();
+  }
 }
