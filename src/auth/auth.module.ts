@@ -9,20 +9,20 @@ import { UsersModule } from 'src/users/users.module';
 import { JwtStrategy } from './jwt.strategy';
 import { sessionSerializer } from './session.serializer';
 
-export const jwtSecret = process.env.SECRET_KEY;
+export const jwtSecret = process.env.SECRET_KEY || "default_secret_key";
+
 @Module({
   imports: [
     ConfigModule,
     PrismaModule,
     PassportModule,
     JwtModule.register({
-      secret: process.env.SECRET_KEY,
-      signOptions: { expiresIn: '1d' }, 
+      secret: jwtSecret,
+      signOptions: { expiresIn: '1d' },
     }),
     UsersModule,
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy, sessionSerializer],
 })
-export class AuthModule {}
-
+export class AuthModule { }

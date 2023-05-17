@@ -1,7 +1,8 @@
-version: '3'
+version: '3.9'
+
 services:
   postgres:
-    image: postgres:14
+    image: postgres:alpine
     ports:
       - 5432:5432
     environment:
@@ -15,3 +16,18 @@ services:
       - PGADMIN_DEFAULT_PASSWORD=SuperSecret
     ports:
       - 15432:80
+  app:
+    image: meselghea/backend
+    container_name: meselghea-backend-app
+    build: .
+    ports:
+      - 3000:3000
+    env_file:
+      - .env
+    depends_on:
+      - postgres
+    restart: always
+
+volumes:
+  postgres:
+

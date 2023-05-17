@@ -1,0 +1,14 @@
+version: '3.9'
+
+services:
+  postgres:
+    image: postgres:alpine
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_DB=dbmesel
+      - POSTGRES_USER=dbmesel_user
+      - POSTGRES_PASSWORD=rU0BK1D0mUO59mrvvFArrmH4aMNOyzTo
+
+volumes:
+  postgres:

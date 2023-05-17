@@ -1,2 +1,8 @@
-.env
 .git
+.env
+dist
+example
+node_modules
+npm-debug.log
+scripts.sh
+COMMANDS.md
